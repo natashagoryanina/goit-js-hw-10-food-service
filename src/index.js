@@ -1,13 +1,10 @@
 import menu from './menu.json';
 import menuCardTemplate from './templates/menu-card.hbs';
 
-const menuList = document.querySelector('ul.js-menu');
-const menuCardMarkup = createMenuCardsMarkup(menu);
-
-menuList.insertAdjacentHTML('beforeend', menuCardMarkup);
-
-function createMenuCardsMarkup(menu) {
-    return menu.map(menuCardTemplate).join('');
+const refs = {
+    menuList: document.querySelector('ul.js-menu'),
+    themeSwitch: document.querySelector('#theme-switch-toggle'),
+    body: document.querySelector('body'),
 }
 
 const Theme = {
@@ -15,24 +12,42 @@ const Theme = {
   DARK: 'dark-theme',
 };
 
-const themeSwitch = document.querySelector('#theme-switch-toggle');
-const body = document.querySelector('body');
+const menuCardMarkup = createMenuCardsMarkup(menu);
 
-console.log(body);
+refs.menuList.insertAdjacentHTML('beforeend', menuCardMarkup);
 
-themeSwitch.addEventListener('change', onBodyThemeChange);
+function createMenuCardsMarkup(menu) {
+    return menu.map(menuCardTemplate).join('');
+}
+
+refs.themeSwitch.addEventListener('change', onBodyThemeChange);
 
 function onBodyThemeChange(e) {
-    if (themeSwitch.hasAttribute('checked')) {
-        themeSwitch.removeAttribute('checked');
-        body.classList.remove('dark-theme');
-        body.classList.add('light-theme');
+    e.preventDefault();
+    if (refs.themeSwitch.hasAttribute('checked')) {
+        refs.themeSwitch.removeAttribute('checked');
+        refs.body.classList.remove(Theme.DARK);
+        refs.body.classList.add(Theme.LIGHT);
+        localStorage.setItem('theme', Theme.LIGHT);
         return;
     }
     else {
-        themeSwitch.setAttribute('checked', true);
-        body.classList.remove('light-theme');
-        body.classList.add('dark-theme');
+        refs.themeSwitch.setAttribute('checked', true);
+        refs.body.classList.remove(Theme.LIGHT);
+        refs.body.classList.add(Theme.DARK);
+        localStorage.setItem('theme', Theme.DARK);
+        return;
+    }
+}
+
+themeChooser();
+
+function themeChooser() {
+    const themeColor = localStorage.getItem('theme');
+
+    if (themeColor && themeColor === Theme.DARK) {
+        refs.themeSwitch.setAttribute('checked', true);
+        refs.body.classList.add(Theme.DARK);
         return;
     }
 }
